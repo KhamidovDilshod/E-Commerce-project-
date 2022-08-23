@@ -1,8 +1,9 @@
 ﻿using E_Commerce.Api.Entities.Auth;
+using E_Commerce.Api.Entities.DTO;
 
 namespace E_Commerce.Api.Repository.Interface;
 
 public interface IToken
 {
-    string CreateToken(JwtRole jwt);
+    JwtDto CreateToken(User user);
 }

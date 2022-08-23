@@ -11,7 +11,7 @@ public class BaseLaptopDto
     public Specs Specs { get; set; }
     public List<Storage> Storage { get; set; }
     public List<Images> Images { get; set; }
-    public List<ImgHelper>ColorImagesList { get; set; }
+    public List<ImgHelper> ColorImagesList { get; set; }
 }
 
 public class ImgHelper
@@ -20,5 +20,6 @@ public class ImgHelper
     {
         base64 = img;
     }
+
     public string base64 { get; set; }
 }

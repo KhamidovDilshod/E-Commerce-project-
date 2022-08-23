@@ -2,14 +2,13 @@
 
 public class Images
 {
-    public Images( string path)
+    public Images(string path)
     {
         Path = path;
     }
 
     public Images()
     {
-        
     }
 
     public int Id { get; set; }

@@ -13,7 +13,7 @@ public class Util
 
     public static async Task<string> ImageByPath(string path)
     {
-        byte[] file = await File.ReadAllBytesAsync(path);
+        var file = await File.ReadAllBytesAsync(path);
         return "data:/image/png;base64," + Convert.ToBase64String(file);
     }
 

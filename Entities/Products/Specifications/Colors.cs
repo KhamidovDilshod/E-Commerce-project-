@@ -2,14 +2,13 @@
 #pragma warning disable
 public class Colors
 {
-    public Colors( string color)
+    public Colors(string color)
     {
         Color = color;
     }
 
     public Colors()
     {
-        
     }
 
     public int Id { get; set; }

@@ -7,7 +7,7 @@ public class RegisterDto
         Token = token;
         PhoneNumber = phoneNumber;
     }
+
     public string Token { get; set; }
     public string PhoneNumber { get; set; }
-    
 }

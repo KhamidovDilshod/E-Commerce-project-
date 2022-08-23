@@ -7,5 +7,5 @@ public interface IProduct
 {
     Task<BaseLaptopDto> GetById(int id);
     Task<List<BaseLaptop>> GetAllMac();
-    Task<BaseLaptopDto> GetByColorId(int colorId,int productId);
+    Task<BaseLaptopDto> GetByColorId(int colorId, int productId);
 }

@@ -2,16 +2,15 @@
 
 public class Display
 {
-    public int Id { get; set; }
-    public string Resolution { get; set; } 
-
-    public Display( string resolution)
+    public Display(string resolution)
     {
         Resolution = resolution;
     }
 
     public Display()
     {
-        
     }
+
+    public int Id { get; set; }
+    public string Resolution { get; set; }
 }

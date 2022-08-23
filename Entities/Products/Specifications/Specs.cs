@@ -3,9 +3,5 @@
 
 public class Specs
 {
-    public Specs()
-    {
-    }
-
     public int Id { get; set; }
 }

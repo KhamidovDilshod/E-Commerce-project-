@@ -1,11 +1,14 @@
-﻿namespace E_Commerce.Api.Entities.Auth;
+﻿using Microsoft.AspNetCore.Identity;
 
-public class User
+#pragma warning disable
+
+namespace E_Commerce.Api.Entities.Auth;
+
+public class User : IdentityUser
 {
-    public int Id { get; set; }
-    public string PhoneNumber { get; set; } = string.Empty;
-    public byte[] PasswordHash { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Custom { get; init; } = String.Empty;
     public byte[] PasswordSalt { get; set; }
-    public Purchased? Purchased { get; set; } = null;
-    public string Role { get; set; }
+    public byte[] PasswordHashed { get; set; }
 }

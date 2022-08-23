@@ -2,14 +2,14 @@
 
 public class LoginDto
 {
-    public LoginDto(string token, bool isAuthenticated, string? message)
+    public LoginDto(JwtDto token, bool isAuthenticated, string? message)
     {
         Token = token;
         IsAuthenticated = isAuthenticated;
         Message = message;
     }
 
-    public string Token { get; set; }
-    public bool IsAuthenticated { get; set; } = false;
-    public string Message { get; set; }
+    public JwtDto Token { get; set; }
+    public bool IsAuthenticated { get; set; }
+    public string? Message { get; set; }
 }

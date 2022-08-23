@@ -15,7 +15,7 @@ public class ProductController : BaseController
         _productRepo = productRepo;
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpGet("laptop/{id}")]
     public async Task<ActionResult<BaseLaptopDto>> GetMacById(int id)
     {
@@ -32,6 +32,6 @@ public class ProductController : BaseController
     [HttpPost("laptop/add")]
     public async Task<ActionResult<string>> AddProduct()
     {
-        return Ok("CVFDd");
+        return Ok("CVFDD");
     }
 }

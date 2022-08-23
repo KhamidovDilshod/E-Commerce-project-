@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using E_Commerce.Api.Entities.Products.Specifications;
+﻿using E_Commerce.Api.Entities.Products.Specifications;
 
 namespace E_Commerce.Api.Entities.Products;
 
@@ -7,7 +6,8 @@ namespace E_Commerce.Api.Entities.Products;
 
 public class BaseLaptop
 {
-    public BaseLaptop( Colors colors, Ram rams, Images images, Display display, Specs specs, Storage storage, string imageIds, string colorIds, string ramIds, string displayIds, string storageIds, string productName)
+    public BaseLaptop(Colors colors, Ram rams, Images images, Display display, Specs specs, Storage storage,
+        string imageIds, string colorIds, string ramIds, string displayIds, string storageIds, string productName)
     {
         Colors = colors;
         Rams = rams;
@@ -25,9 +25,8 @@ public class BaseLaptop
 
     public BaseLaptop()
     {
-        
     }
-    
+
 
     public int Id { get; set; }
     public string ProductName { get; set; }

@@ -1,8 +1,10 @@
 using System.Text;
 using E_Commerce.Api.Entities;
+using E_Commerce.Api.Entities.Auth;
 using E_Commerce.Api.Repository;
 using E_Commerce.Api.Repository.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -22,25 +24,33 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(configuration.GetConnectionString("Postgres")));
 
-var key = configuration.GetValue<string>("AppSettings:Secret");
-//For JWT
-builder.Services.AddAuthentication(x =>
+
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(options =>
     {
-        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
     })
-    .AddJwtBearer(x =>
+    //Add JWT bearer
+    .AddJwtBearer(options =>
     {
-        x.RequireHttpsMetadata = false;
-        x.SaveToken = true;
-        x.TokenValidationParameters = new TokenValidationParameters
+        options.SaveToken = true;
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters()
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+            IssuerSigningKey =
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:Secret"))),
             ValidateIssuer = true,
-            ValidateAudience = true
+            ValidIssuer = configuration["AppSettings:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = configuration["AppSettings:Audience"]
         };
     });
+
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 var app = builder.Build();
@@ -58,8 +68,8 @@ await seed.Handler();
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

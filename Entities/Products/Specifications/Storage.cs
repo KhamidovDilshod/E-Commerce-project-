@@ -2,14 +2,13 @@
 
 public class Storage
 {
-    public Storage( string memory)
+    public Storage(string memory)
     {
         Memory = memory;
     }
 
     public Storage()
     {
-        
     }
 
     public int Id { get; set; }

@@ -38,14 +38,13 @@ public class ProductRepository : IProduct
         var result = await _context.Laptop.Where(l => l.Id == productId).FirstAsync();
         var dto = await DtoMapper(result);
         var found = await ImageByColorFinder(colorId);
-        List<ImgHelper> im = new List<ImgHelper>();
+        var im = new List<ImgHelper>();
+        var thread = new Thread(() => DtoMapper(result));
+        thread.Start();
+        Console.WriteLine(thread.ToString());
         foreach (var img in found)
-        {
-            foreach (var p in img.ImagePath.Split("|"))
-            {
-                im.Add(new ImgHelper(await Util.ImageByPath(p)));
-            }
-        }
+        foreach (var p in img.ImagePath.Split("|"))
+            im.Add(new ImgHelper(await Util.ImageByPath(p)));
 
         dto.ColorImagesList = im;
         dto.Images = null;
@@ -61,30 +60,15 @@ public class ProductRepository : IProduct
         var img = new List<Images>();
         var dis = new List<Display>();
         var sto = new List<Storage>();
-        foreach (var c in result.ColorIds.Split(","))
-        {
-            color.Add(await ColorFinder(Parse(c)));
-        }
+        foreach (var c in result.ColorIds.Split(",")) color.Add(await ColorFinder(Parse(c)));
 
-        foreach (var r in result.RamIds.Split(","))
-        {
-            ram.Add(await RamFinder(Parse(r)));
-        }
+        foreach (var r in result.RamIds.Split(",")) ram.Add(await RamFinder(Parse(r)));
 
-        foreach (var i in result.ImageIds.Split(","))
-        {
-            img.Add(await ImageFinder(Parse(i)));
-        }
+        foreach (var i in result.ImageIds.Split(",")) img.Add(await ImageFinder(Parse(i)));
 
-        foreach (var d in result.DisplayIds.Split(","))
-        {
-            dis.Add(await DisplayFinder(Parse(d)));
-        }
+        foreach (var d in result.DisplayIds.Split(",")) dis.Add(await DisplayFinder(Parse(d)));
 
-        foreach (var d in result.StorageIds.Split(","))
-        {
-            sto.Add(await StorageFinder(Parse(d)));
-        }
+        foreach (var d in result.StorageIds.Split(",")) sto.Add(await StorageFinder(Parse(d)));
 
         baseDto.Colors = color;
         baseDto.Rams = ram;

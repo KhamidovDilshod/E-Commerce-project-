@@ -4,7 +4,8 @@ using E_Commerce.Api.Entities;
 using E_Commerce.Api.Entities.Auth;
 using E_Commerce.Api.Entities.DTO;
 using E_Commerce.Api.Repository.Interface;
-using Microsoft.EntityFrameworkCore;
+
+#pragma warning disable
 
 namespace E_Commerce.Api.Repository;
 
@@ -19,57 +20,65 @@ public class AuthRepository : IAuth
         _token = token;
     }
 
-    public async Task<LoginDto>? Login(Login login)
+    public  LoginDto Login(Login login)
     {
-        var result = await FindUser(login.PhoneNumber);
-        if (result != null && result.Role == login.Role.ToString())
+        var result = FindUser(login.PhoneNumber);
+        var user = result[0];
+        if (result.Count != 1) return new LoginDto(null, false, "User Not found");
+        return VerifyPassword(login.Password, user.PasswordHashed, user.PasswordSalt)
+            ? new LoginDto(_token.CreateToken(user), true, "Logged in")
+            : new LoginDto(null, true, "Bad credentials");
+    }
+
+    public async Task<User?> Register(Register register)
+    {
+        var isExists = FindUser(register.PhoneNumber);
+        switch (isExists.Count)
         {
-            var hmac = new HMACSHA512(result.PasswordSalt);
-            var role = new JwtRole
+            case > 0:
+                return null;
+            case 0:
             {
-                Role = login.Role.ToString(),
-                PhoneNumber = login.PhoneNumber
-            };
-            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(login.Password));
-            for (int i = 0; i < computedHash.Length; i++)
-            {
-                if (computedHash[i] != result.PasswordHash[i]) return null;
-                return new LoginDto(_token.CreateToken(role), true, "Logged In");
+                Encoder(register.Password, out var passwordHash, out var passwordSalt);
+                var user = new User
+                {
+                    FirstName = register.FirstName,
+                    LastName = register.LastName,
+                    PhoneNumber = register.PhoneNumber,
+                    Email = register.EmailAddress,
+                    UserName = register.UserName,
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    PasswordHashed = passwordHash,
+                    PasswordSalt = passwordSalt,
+                    NormalizedUserName = register.Role
+                };
+                var res = (await _context.Users.AddAsync(user)).Entity;
+                await _context.SaveChangesAsync();
+                res.PasswordSalt = null;
+                res.PasswordHashed = null;
+                return res;
             }
+            default: return null;
         }
-
-        return null;
     }
 
-    public async Task<LoginDto?> Register(Register register)
+    private List<User> FindUser(string phoneNumber)
     {
-        var result = await FindUser(register.PhoneNumber);
-        if (result == null)
-        {
-            var role = new JwtRole
-            {
-                Role = register.Role.ToString(),
-                PhoneNumber = register.PhoneNumber
-            };
-            var hmac = new HMACSHA512();
-            var user = new User
-            {
-                PhoneNumber = register.PhoneNumber,
-                PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(register.Password)),
-                PasswordSalt = hmac.Key,
-                Role = register.Role
-            };
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-            return new LoginDto(_token.CreateToken(role), true, "User registered");
-        }
-
-        return null;
+        var result = _context.Users.FirstOrDefault(u => u.PhoneNumber == phoneNumber);
+        return result is null ? new List<User>() : new List<User> {result};
     }
 
-    private async Task<User> FindUser(string phoneNumber)
+    private void Encoder(string password, out byte[] passwordHash, out byte[] passwordSalt)
     {
-        var result = await _context.Users.Where(u => u.PhoneNumber == phoneNumber).FirstOrDefaultAsync();
-        return result;
+        using var hmac = new HMACSHA512();
+        passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+        passwordSalt = hmac.Key;
+    }
+
+    private bool VerifyPassword(string password, IEnumerable<byte> passwordHash, byte[] passwordSalt)
+    {
+        using var hmac = new HMACSHA512(passwordSalt);
+        var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+        return computedHash.SequenceEqual(passwordHash);
     }
 }

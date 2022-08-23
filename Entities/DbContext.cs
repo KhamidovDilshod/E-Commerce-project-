@@ -10,15 +10,15 @@ public class DataContext : DbContext
 {
     private readonly IConfiguration _configuration;
 
-    public DataContext(DbContextOptions<DataContext> options,IConfiguration configuration) : base(options)
+    public DataContext(DbContextOptions<DataContext> options, IConfiguration configuration) : base(options)
     {
         _configuration = configuration;
     }
 
     public DataContext()
     {
-        
     }
+
     public DbSet<User> Users { get; set; }
     public DbSet<Purchased> PurchasedItems { get; set; }
     public DbSet<BaseLaptop> Laptop { get; set; }
@@ -29,17 +29,16 @@ public class DataContext : DbContext
     public DbSet<Specs> Specifications { get; set; }
     public DbSet<Storage> Storage { get; set; }
     public DbSet<ColorImages> ColorImages { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-       base.OnModelCreating(builder);
+        base.OnModelCreating(builder);
     }
+
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        if (!options.IsConfigured)
-        {
-            options.UseNpgsql(_configuration.GetValue<string>("ConnectionStrings:Postgres"));
-        }
+        if (!options.IsConfigured) options.UseNpgsql(_configuration.GetValue<string>("ConnectionStrings:Postgres"));
     }
 }
